@@ -1,55 +1,56 @@
-class RandomUser {
-	constructor() {
-		this.API_POINT = null;
-		this.userContainer = null;
-		this.userData = {
-			title: null,
-			name: null,
-			surname: null,
-		};
-		this.UISelectors = {
-			image: null,
-			heading: null,
-			email: null,
-		};
-		this.initialize();
+// Ta klasa pobiera dane
+class RandomUserFetcher {
+	// URL API przekazujemy z zewnątrz.
+	constructor( apiURL ) {
+		this.apiURL = apiURL;
 	}
-	initialize() {
-		this.userContainer = document.querySelector("[data-userList]");
 
-		this.UISelectors.image = document.querySelector("[data-userImage]");
-		this.UISelectors.heading = document.querySelector("[data-userTitle]");
-		this.UISelectors.email = document.querySelector("[data-userEmail");
-
-		this.API_POINT = `https://randomuser.me/api/`;
-		this.fetchData();
-	}
 	async fetchData() {
-		try {
-			const response = await fetch(this.API_POINT);
-			const data = await response.json();
-			this.getUserData(data);
-		} catch {
-			throw new Error("Something went wrong");
-		}
-	}
-	async getUserData({ results }) {
-		const { name, picture, email } = results[0];
-		const { title, first, last } = name;
+		const response = await fetch( this.apiURL );
 
-		this.userData.title = title;
-		this.userData.name = first;
-		this.userData.surname = last;
-
-		this.dataIntoHTML(picture, email);
+		return response.json();
 	}
-	dataIntoHTML(picture, email) {
-		this.UISelectors.image.src = picture.large;
-		this.UISelectors.heading.innerHTML = `${Object.values(this.userData).join(
-			" "
-		)}`;
-		this.UISelectors.email.innerHTML = email;
+
+	async getUser() {
+		const { results } = await this.fetchData();
+
+		// Zadaniem tej klasy jest zwrócenie danych pierwszego, losowego usera.
+		return results[ 0 ];
 	}
 }
 
-const randomUser = new RandomUser();
+// Ta klasa wyświetla dane usera.
+class RandomUserRenderer {
+	// Selektory mogą zostać przekazane z zewnątrz, ale renderer ma też domyślne.
+	// Trzeba jedynie przekazać selektor głównego kontenera.
+	constructor( container, {
+		imageContainer = '[data-userImage]',
+		titleContainer = '[data-userTitle]',
+		emailContainer = '[data-userEmail]'
+	} = {} ) {
+		this.container = document.querySelector( container );
+		this.imageContainer = this.container.querySelector( imageContainer );
+		this.titleContainer = this.container.querySelector( titleContainer );
+		this.emailContainer = this.container.querySelector( emailContainer );
+	}
+
+	// Ta funkcja przyjmuje dane usera z zewnątrz i je formatuje.
+	render( { name, picture, email } ) {
+		this.imageContainer.src = picture.large;
+		this.titleContainer.textContent = Object.values( name ).join( ' ' );
+		this.emailContainer.textContent = email;
+	}
+}
+
+// Kod uruchamiający aplikację – IIAFE (https://twitter.com/rauschma/status/785203409347633152).
+// Potrzebne do ładnej obsługi asynchroniczności.
+( async function(){
+	// Tworzę sobie potrzebne nam klasy.
+	const randomUserFetcher = new RandomUserFetcher( 'https://randomuser.me/api/' );
+	const randomUserRenderer = new RandomUserRenderer( '[data-userList]' );
+	// Pobieram dane losowego usera.
+	const randomUser = await randomUserFetcher.getUser();
+
+	// Wyświetlam pobrane dane.
+	randomUserRenderer.render( randomUser );
+}() );

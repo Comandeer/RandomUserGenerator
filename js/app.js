@@ -1,15 +1,8 @@
-import RandomUserFetcher from './RandomUserFetcher.js';
-import RandomUserRenderer from './RandomUserRenderer.js';
+import fetchRandomUser from './fetchRandomUser.js';
+import renderRandomUser from './renderRandomUser.js';
 
-// Kod uruchamiający aplikację – IIAFE (https://twitter.com/rauschma/status/785203409347633152).
-// Potrzebne do ładnej obsługi asynchroniczności.
 ( async function(){
-	// Tworzę sobie potrzebne nam klasy.
-	const randomUserFetcher = new RandomUserFetcher( 'https://randomuser.me/api/' );
-	const randomUserRenderer = new RandomUserRenderer( '[data-userList]' );
-	// Pobieram dane losowego usera.
-	const randomUser = await randomUserFetcher.getUser();
+	const randomUser = await fetchRandomUser( 'https://randomuser.me/api/' )
 
-	// Wyświetlam pobrane dane.
-	randomUserRenderer.render( randomUser );
+	renderRandomUser( '[data-userList]', randomUser );
 }() );

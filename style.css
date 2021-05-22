@@ -1,0 +1,36 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+.page {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	background-color: aliceblue;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.page__user {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	height: 40%;
+	width: 60%;
+	background-color: white;
+	border-radius: 20px;
+}
+.user__image {
+	border-radius: 50%;
+}
+.page__title {
+	color: cadetblue;
+}
+
+@media (max-width: 660px) {
+	.page__user {
+		flex-direction: column;
+		width: 70%;
+	}
+}
